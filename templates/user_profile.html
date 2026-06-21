@@ -1,0 +1,37 @@
+<!DOCTYPE html> <html> <head> <title>@{{ user_profile.username }}</title> </head> <body> <h1>@ {{ user_profile.username }}</h1> <div style="display:flex; align-items:center; gap:15px; margin-bottom:10px;">
+{% if profile.avatar %}
+    <img
+        src="{{ profile.avatar.url }}"
+        width="150"
+        height="150"
+        style="border-radius:50%; object-fit:cover;"
+    >
+{% endif %}
+
+<h2 style="margin:0;">
+    {{ profile_user.username }}
+</h2>
+</div> <p>{{ profile.bio }}</p> <hr> <h2>Publicaciones</h2>
+
+{% for post in posts %}
+
+<div style="border:1px solid #ccc; padding:10px; margin:10px;">
+<p>{{ post.content }}</p>
+
+{% if post.image %}
+    <br><br>
+
+    <img
+        src="{{ post.image.url }}"
+        width="400"
+    >
+{% endif %}
+</div>
+
+{% empty %}
+
+<p>Este usuario todavía no publicó nada.</p>
+
+{% endfor %}
+
+</body> </html>
