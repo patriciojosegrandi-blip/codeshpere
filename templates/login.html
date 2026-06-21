@@ -1,24 +1,142 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Login</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CodeSphere - Login</title>
+
+<style>
+    *{
+        margin:0;
+        padding:0;
+        box-sizing:border-box;
+        font-family: Arial, sans-serif;
+    }
+
+    body{
+        background:#f0f2f5;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        height:100vh;
+    }
+
+    .login-box{
+        background:white;
+        width:350px;
+        padding:40px;
+        border-radius:15px;
+        box-shadow:0 10px 25px rgba(0,0,0,0.1);
+        text-align:center;
+    }
+
+    .logo{
+        font-size:32px;
+        font-weight:bold;
+        margin-bottom:25px;
+        color:#1877f2;
+    }
+
+    input{
+        width:100%;
+        padding:12px;
+        margin-bottom:12px;
+        border:1px solid #ddd;
+        border-radius:8px;
+        font-size:15px;
+    }
+
+    input:focus{
+        outline:none;
+        border-color:#1877f2;
+    }
+
+    button{
+        width:100%;
+        padding:12px;
+        background:#1877f2;
+        color:white;
+        border:none;
+        border-radius:8px;
+        font-size:16px;
+        font-weight:bold;
+        cursor:pointer;
+        transition:0.2s;
+    }
+
+    button:hover{
+        transform:scale(1.02);
+    }
+
+    .register{
+        margin-top:20px;
+        font-size:14px;
+        color:#666;
+    }
+
+    .register a{
+        text-decoration:none;
+        color:#1877f2;
+        font-weight:bold;
+    }
+
+    .register a:hover{
+        text-decoration:underline;
+    }
+
+    .show-password{
+        margin-bottom:15px;
+        text-align:left;
+        font-size:14px;
+        color:#555;
+    }
+</style>
 </head>
 <body>
 
-<h2>Iniciar sesión</h2>
+<div class="login-box">
 
-<form method="POST">
-    {% csrf_token %}
-    <input type="text" name="username" placeholder="Usuario">
-    <br><br>
-    <input type="password" name="password" placeholder="Contraseña">
-    <br><br>
-    <button type="submit">Entrar</button>
-</form>
+    <div class="logo">CodeSphere</div>
 
-<br>
+    <form method="POST">
+        {% csrf_token %}
 
-<a href="/register/">Crear cuenta</a>
+        <input type="text"
+               name="username"
+               placeholder="Usuario">
+
+        <input type="password"
+               name="password"
+               id="password"
+               placeholder="Contraseña">
+
+        <div class="show-password">
+            <input type="checkbox"
+                   onclick="togglePassword()">
+            Mostrar contraseña
+        </div>
+
+        <button type="submit">Entrar</button>
+    </form>
+
+    <div class="register">
+        ¿No tienes cuenta?<br>
+        <a href="/register/">Crear cuenta</a>
+    </div>
+
+</div>
+
+<script>
+function togglePassword(){
+    let pass = document.getElementById("password");
+
+    if(pass.type === "password"){
+        pass.type = "text";
+    }else{
+        pass.type = "password";
+    }
+}
+</script>
 
 </body>
 </html>

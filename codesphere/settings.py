@@ -1,9 +1,10 @@
 """
 Django settings for codesphere project (PRODUCCIÓN SEGURA)
 """
-
+import cloudinary
 from pathlib import Path
 import os
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -137,7 +138,17 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# =========================
+# cloud o gestor de imagenes
+# =========================
 
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'dykyaujn3',
+    'API_KEY': '797779726976892',
+    'API_SECRET': 'pSf3lorPC-FOmMXl7-HEK4Y2c1s'
+}
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 # =========================
 # LOGIN SYSTEM
 # =========================
