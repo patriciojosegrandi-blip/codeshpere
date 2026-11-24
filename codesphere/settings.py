@@ -141,14 +141,18 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # =========================
 # cloud o gestor de imagenes
 # =========================
+# =========================
+# CLOUDINARY
+# =========================
 
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': 'django',
-    'API_KEY': '797779726976892',
-    'API_SECRET': 'pSf3lorPC-FOmMXl7-HEK4Y2c1s'
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', ''),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY', ''),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET', ''),
 }
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
 # =========================
 # LOGIN SYSTEM
 # =========================
