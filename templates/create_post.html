@@ -1,61 +1,339 @@
+```html
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Nuevo Post</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear publicación | CodeSphere</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        body {
-            background: #f3f4f6;
-            font-family: Arial, sans-serif;
+        :root {
+            --bg: #f5f5f0;
+            --surface: #ffffff;
+            --text: #252820;
+            --muted: #85877d;
+            --border: #e8e9e1;
+            --primary: #647c55;
+            --primary-hover: #536a46;
+            --soft: #f0f2eb;
+            --input: #fafbf8;
+            --shadow: 0 12px 35px rgba(40, 45, 30, 0.06);
         }
 
-        .box {
-            width: 600px;
-            margin: 50px auto;
-            background: white;
-            padding: 20px;
+        body.dark {
+            --bg: #171914;
+            --surface: #22251e;
+            --text: #f0f1e9;
+            --muted: #a0a394;
+            --border: #383c32;
+            --primary: #91a97d;
+            --primary-hover: #a5bd91;
+            --soft: #30362a;
+            --input: #292d24;
+            --shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            transition: background .25s, color .25s;
+        }
+
+        nav {
+            height: 75px;
+            padding: 0 7%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 25px;
+            font-weight: 700;
+            color: var(--text);
+            text-decoration: none;
+            letter-spacing: -1px;
+        }
+
+        .logo span {
+            color: var(--primary);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-link {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .theme-button {
+            border: 1px solid var(--border);
+            background: var(--soft);
+            color: var(--text);
+            width: 40px;
+            height: 40px;
             border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,.1);
+            cursor: pointer;
+            font-size: 17px;
+        }
+
+        main {
+            max-width: 680px;
+            margin: 65px auto;
+            padding: 0 20px;
+        }
+
+        .heading {
+            margin-bottom: 25px;
+        }
+
+        .heading small {
+            color: var(--primary);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-size: 11px;
+        }
+
+        h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 34px;
+            margin: 8px 0;
+            letter-spacing: -1.5px;
+        }
+
+        .heading p {
+            color: var(--muted);
+            margin: 0;
+            font-size: 15px;
+        }
+
+        .editor {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 28px;
+            box-shadow: var(--shadow);
+        }
+
+        .editor-top {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 22px;
+        }
+
+        .avatar {
+            width: 43px;
+            height: 43px;
+            border-radius: 14px;
+            background: var(--soft);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 17px;
+        }
+
+        .editor-top strong {
+            display: block;
+            font-size: 14px;
+        }
+
+        .editor-top span {
+            display: block;
+            color: var(--muted);
+            font-size: 12px;
+            margin-top: 3px;
         }
 
         textarea {
             width: 100%;
-            height: 150px;
-            padding: 10px;
-            resize: none;
-            border-radius: 8px;
-            border: 1px solid #ccc;
+            min-height: 190px;
+            padding: 18px;
+            resize: vertical;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: var(--input);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 15px;
+            line-height: 1.7;
+            outline: none;
+            transition: border .2s, background .2s;
         }
 
-        button {
-            margin-top: 10px;
-            background: #2563eb;
+        textarea:focus {
+            border-color: var(--primary);
+        }
+
+        textarea::placeholder {
+            color: var(--muted);
+        }
+
+        .editor-bottom {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 20px;
+            gap: 15px;
+        }
+
+        .hint {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .cancel {
+            text-decoration: none;
+            color: var(--muted);
+            padding: 12px 17px;
+            border-radius: 11px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .publish {
+            background: var(--primary);
             color: white;
             border: none;
-            padding: 10px 15px;
-            border-radius: 8px;
+            padding: 12px 21px;
+            border-radius: 11px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
             cursor: pointer;
+            transition: background .2s, transform .2s;
+        }
+
+        .publish:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 500px) {
+            nav {
+                padding: 0 5%;
+            }
+
+            main {
+                margin: 40px auto;
+            }
+
+            .editor {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 29px;
+            }
+
+            .editor-bottom {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .actions {
+                justify-content: flex-end;
+            }
         }
     </style>
 </head>
+
 <body>
 
-<div class="box">
-    <h2>Crear publicación</h2>
+<nav>
+    <a href="/" class="logo">Code<span>Sphere</span></a>
 
-<form method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
+    <div class="nav-right">
+        <a href="/" class="nav-link">Volver al inicio</a>
+        <button class="theme-button" id="themeButton" onclick="toggleTheme()" aria-label="Cambiar tema">🌙</button>
+    </div>
+</nav>
 
-    <textarea name="content" placeholder="¿Qué estás pensando?"></textarea>
+<main>
+    <div class="heading">
+        <small>Tu espacio</small>
+        <h1>Crear publicación</h1>
+        <p>Compartí algo con la comunidad de CodeSphere.</p>
+    </div>
 
-    <br><br>
+    <div class="editor">
+        <div class="editor-top">
+            <div class="avatar">{{ request.user.username|first|upper }}</div>
+            <div>
+                <strong>{{ request.user.username }}</strong>
+                <span>Publicando en CodeSphere</span>
+            </div>
+        </div>
 
-    <input type="file" name="image">
+        <form method="POST">
+            {% csrf_token %}
 
-    <br><br>
+            <textarea
+                name="content"
+                placeholder="¿Qué estás pensando?"
+                required
+            ></textarea>
 
-    <button type="submit">Publicar</button>
-</form>
+            <div class="editor-bottom">
+                <span class="hint">✦ Compartí tus ideas con respeto.</span>
+
+                <div class="actions">
+                    <a href="/" class="cancel">Cancelar</a>
+                    <button type="submit" class="publish">Publicar ↗</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</main>
+
+<script>
+    const themeButton = document.getElementById("themeButton");
+
+    function applyTheme(theme) {
+        document.body.classList.toggle("dark", theme === "dark");
+        themeButton.textContent = theme === "dark" ? "☀️" : "🌙";
+    }
+
+    function toggleTheme() {
+        const newTheme = document.body.classList.contains("dark")
+            ? "light"
+            : "dark";
+
+        localStorage.setItem("codesphere-theme", newTheme);
+        applyTheme(newTheme);
+    }
+
+    applyTheme(localStorage.getItem("codesphere-theme") || "light");
+</script>
 
 </body>
 </html>
+```
