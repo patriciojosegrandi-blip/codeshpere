@@ -147,6 +147,7 @@ CLOUDINARY_STORAGE = {
     'API_KEY': '797779726976892',
     'API_SECRET': 'pSf3lorPC-FOmMXl7-HEK4Y2c1s'
 }
+CLOUDINARY_URL=cloudinary://<797779726976892>:<pSf3lorPC-FOmMXl7-HEK4Y2c1s>@dykyaujn3
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 # =========================
