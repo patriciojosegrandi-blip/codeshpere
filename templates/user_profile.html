@@ -1,37 +1,601 @@
-<!DOCTYPE html> <html> <head> <title>@{{ user_profile.username }}</title> </head> <body> <h1>@ {{ user_profile.username }}</h1> <div style="display:flex; align-items:center; gap:15px; margin-bottom:10px;">
-{% if profile.avatar %}
-    <img
-        src="{{ profile.avatar.url }}"
-        width="150"
-        height="150"
-        style="border-radius:50%; object-fit:cover;"
-    >
-{% endif %}
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@{{ user_profile.username }} | CodeSphere</title>
 
-<h2 style="margin:0;">
-    {{ profile_user.username }}
-</h2>
-</div> <p>{{ profile.bio }}</p> <hr> <h2>Publicaciones</h2>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 
-{% for post in posts %}
+    <style>
+        :root {
+            --bg: #f5f5f0;
+            --surface: #ffffff;
+            --text: #252820;
+            --muted: #85877d;
+            --border: #e8e9e1;
+            --primary: #647c55;
+            --primary-hover: #536a46;
+            --soft: #f0f2eb;
+            --shadow: 0 12px 35px rgba(40,45,30,.06);
+        }
 
-<div style="border:1px solid #ccc; padding:10px; margin:10px;">
-<p>{{ post.content }}</p>
+        body.dark {
+            --bg: #171914;
+            --surface: #22251e;
+            --text: #f0f1e9;
+            --muted: #a0a394;
+            --border: #383c32;
+            --primary: #91a97d;
+            --primary-hover: #a5bd91;
+            --soft: #30362a;
+            --shadow: 0 12px 35px rgba(0,0,0,.2);
+        }
 
-{% if post.image %}
-    <br><br>
+        * {
+            box-sizing: border-box;
+        }
 
-    <img
-        src="{{ post.image.url }}"
-        width="400"
-    >
-{% endif %}
-</div>
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            transition: background .25s, color .25s;
+        }
 
-{% empty %}
+        nav {
+            height: 75px;
+            padding: 0 7%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+        }
 
-<p>Este usuario todavía no publicó nada.</p>
+        .logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 25px;
+            font-weight: 700;
+            color: var(--text);
+            text-decoration: none;
+            letter-spacing: -1px;
+        }
 
-{% endfor %}
+        .logo span {
+            color: var(--primary);
+        }
 
-</body> </html>
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .nav-link {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .theme-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--soft);
+            color: var(--text);
+            cursor: pointer;
+            font-size: 17px;
+        }
+
+        main {
+            max-width: 1050px;
+            margin: 45px auto;
+            padding: 0 20px;
+        }
+
+        .cover {
+            height: 190px;
+            border-radius: 22px;
+            background:
+                radial-gradient(circle at 80% 20%, rgba(255,255,255,.3), transparent 25%),
+                linear-gradient(120deg, #647c55, #a4b58b);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cover::after {
+            content: "CODESPHERE";
+            position: absolute;
+            right: 25px;
+            bottom: -15px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(45px, 9vw, 100px);
+            font-weight: 700;
+            color: rgba(255,255,255,.15);
+            letter-spacing: -5px;
+        }
+
+        .profile-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 28px;
+            margin-top: -35px;
+            position: relative;
+            box-shadow: var(--shadow);
+        }
+
+        .profile-top {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .avatar {
+            width: 95px;
+            height: 95px;
+            flex-shrink: 0;
+            border-radius: 27px;
+            background: var(--soft);
+            border: 5px solid var(--surface);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 39px;
+            font-weight: 700;
+            margin-top: -50px;
+        }
+
+        .identity {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .identity h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 27px;
+            margin: 0 0 4px;
+            overflow-wrap: anywhere;
+        }
+
+        .handle {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .member-tag {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 6px 11px;
+            background: var(--soft);
+            color: var(--primary);
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .bio {
+            margin-top: 25px;
+            padding: 18px;
+            background: var(--soft);
+            border-radius: 14px;
+        }
+
+        .section-label {
+            font-size: 11px;
+            color: var(--primary);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            margin-bottom: 9px;
+        }
+
+        .bio p {
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.7;
+            color: var(--text);
+            overflow-wrap: anywhere;
+        }
+
+        .bio-empty {
+            color: var(--muted) !important;
+            font-style: italic;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat {
+            padding: 20px;
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            background: var(--surface);
+        }
+
+        .stat-icon {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .stat-number {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 25px;
+            font-weight: 700;
+        }
+
+        .stat-label {
+            color: var(--muted);
+            font-size: 12px;
+            margin-top: 3px;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 270px 1fr;
+            gap: 20px;
+            margin-top: 25px;
+            align-items: start;
+        }
+
+        .side-card, .posts-section {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 17px;
+            padding: 22px;
+            box-shadow: var(--shadow);
+        }
+
+        .side-card h3, .posts-section h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            margin: 0 0 18px;
+            font-size: 18px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-icon {
+            width: 37px;
+            height: 37px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--soft);
+            border-radius: 11px;
+            flex-shrink: 0;
+        }
+
+        .info-text strong {
+            display: block;
+            font-size: 12px;
+        }
+
+        .info-text span {
+            display: block;
+            color: var(--muted);
+            font-size: 11px;
+            margin-top: 3px;
+        }
+
+        .post {
+            padding: 18px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .post:last-child {
+            border-bottom: none;
+        }
+
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .post-date {
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .post-badge {
+            color: var(--primary);
+            background: var(--soft);
+            border-radius: 20px;
+            padding: 5px 9px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .post-content {
+            font-size: 14px;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+
+        .empty {
+            padding: 35px 15px;
+            text-align: center;
+        }
+
+        .empty-icon {
+            font-size: 35px;
+            margin-bottom: 12px;
+        }
+
+        .empty strong {
+            display: block;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 16px;
+        }
+
+        .empty p {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 35px 15px;
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        @media (max-width: 750px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats {
+                gap: 9px;
+            }
+
+            .stat {
+                padding: 14px;
+            }
+
+            .stat-number {
+                font-size: 21px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            nav {
+                padding: 0 5%;
+            }
+
+            main {
+                margin-top: 25px;
+            }
+
+            .cover {
+                height: 140px;
+            }
+
+            .profile-card {
+                padding: 20px;
+            }
+
+            .profile-top {
+                gap: 13px;
+            }
+
+            .avatar {
+                width: 75px;
+                height: 75px;
+                font-size: 30px;
+            }
+
+            .identity h1 {
+                font-size: 21px;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .stat {
+                display: flex;
+                align-items: center;
+                gap: 13px;
+            }
+
+            .stat-icon {
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<nav>
+    <a href="/" class="logo">Code<span>Sphere</span></a>
+
+    <div class="nav-right">
+        <a href="/" class="nav-link">Inicio</a>
+        <button class="theme-button" id="themeButton" onclick="toggleTheme()">🌙</button>
+    </div>
+</nav>
+
+<main>
+
+    <div class="cover"></div>
+
+    <section class="profile-card">
+
+        <div class="profile-top">
+            <div class="avatar">
+                {{ user_profile.username|first|upper }}
+            </div>
+
+            <div class="identity">
+                <h1>{{ user_profile.username }}</h1>
+                <div class="handle">@{{ user_profile.username }}</div>
+                <span class="member-tag">✦ Comunidad CodeSphere</span>
+            </div>
+        </div>
+
+        <div class="bio">
+            <div class="section-label">✦ Sobre mí</div>
+
+            {% if profile.bio %}
+                <p>{{ profile.bio|linebreaksbr }}</p>
+            {% else %}
+                <p class="bio-empty">Este usuario todavía no escribió una presentación.</p>
+            {% endif %}
+        </div>
+
+    </section>
+
+    <section class="stats">
+
+        <div class="stat">
+            <div class="stat-icon">📝</div>
+            <div>
+                <div class="stat-number">{{ posts|length }}</div>
+                <div class="stat-label">Publicaciones</div>
+            </div>
+        </div>
+
+        <div class="stat">
+            <div class="stat-icon">📅</div>
+            <div>
+                <div class="stat-number">{{ user_profile.date_joined|date:"Y" }}</div>
+                <div class="stat-label">Año de registro</div>
+            </div>
+        </div>
+
+        <div class="stat">
+            <div class="stat-icon">🌱</div>
+            <div>
+                <div class="stat-number">Activo</div>
+                <div class="stat-label">En CodeSphere</div>
+            </div>
+        </div>
+
+    </section>
+
+    <div class="content-grid">
+
+        <aside class="side-card">
+            <h3>Información</h3>
+
+            <div class="info-item">
+                <div class="info-icon">👤</div>
+                <div class="info-text">
+                    <strong>Usuario</strong>
+                    <span>@{{ user_profile.username }}</span>
+                </div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-icon">📆</div>
+                <div class="info-text">
+                    <strong>Se unió el</strong>
+                    <span>{{ user_profile.date_joined|date:"d/m/Y" }}</span>
+                </div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-icon">💬</div>
+                <div class="info-text">
+                    <strong>Publicaciones</strong>
+                    <span>{{ posts|length }} en total</span>
+                </div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-icon">🌍</div>
+                <div class="info-text">
+                    <strong>Comunidad</strong>
+                    <span>CodeSphere</span>
+                </div>
+            </div>
+        </aside>
+
+        <section class="posts-section">
+
+            <h2>Actividad reciente ✨</h2>
+
+            {% for post in posts %}
+                <article class="post">
+
+                    <div class="post-header">
+                        <span class="post-badge">PUBLICACIÓN</span>
+
+                        <span class="post-date">
+                            {{ post.created_at|date:"d/m/Y · H:i" }}
+                        </span>
+                    </div>
+
+                    <div class="post-content">{{ post.content }}</div>
+
+                </article>
+
+            {% empty %}
+                <div class="empty">
+                    <div class="empty-icon">🍃</div>
+                    <strong>Todo está tranquilo por aquí</strong>
+                    <p>Este usuario todavía no publicó nada.</p>
+                </div>
+            {% endfor %}
+
+        </section>
+
+    </div>
+
+</main>
+
+<footer>
+    CodeSphere · Un espacio para compartir ideas.
+</footer>
+
+<script>
+    const themeButton = document.getElementById("themeButton");
+
+    function applyTheme(theme) {
+        document.body.classList.toggle("dark", theme === "dark");
+        themeButton.textContent = theme === "dark" ? "☀️" : "🌙";
+    }
+
+    function toggleTheme() {
+        const newTheme = document.body.classList.contains("dark")
+            ? "light"
+            : "dark";
+
+        localStorage.setItem("codesphere-theme", newTheme);
+        applyTheme(newTheme);
+    }
+
+    applyTheme(localStorage.getItem("codesphere-theme") || "light");
+</script>
+
+</body>
+</html>
+```
