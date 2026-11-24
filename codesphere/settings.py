@@ -143,7 +143,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # =========================
 
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': 'dykyaujn3',
+    'CLOUD_NAME': 'django',
     'API_KEY': '797779726976892',
     'API_SECRET': 'pSf3lorPC-FOmMXl7-HEK4Y2c1s'
 }
