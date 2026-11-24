@@ -1,89 +1,350 @@
+```html
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Mi Perfil</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil | CodeSphere</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        body{
-            background:#f3f4f6;
-            font-family:Arial,sans-serif;
+        :root {
+            --bg: #f5f5f0;
+            --surface: #ffffff;
+            --text: #252820;
+            --muted: #85877d;
+            --border: #e8e9e1;
+            --primary: #647c55;
+            --primary-hover: #536a46;
+            --soft: #f0f2eb;
+            --input: #fafbf8;
+            --shadow: 0 12px 35px rgba(40, 45, 30, 0.06);
         }
 
-        .card{
-            width:600px;
-            margin:40px auto;
-            background:white;
-            padding:20px;
-            border-radius:12px;
-            box-shadow:0 2px 10px rgba(0,0,0,.1);
+        body.dark {
+            --bg: #171914;
+            --surface: #22251e;
+            --text: #f0f1e9;
+            --muted: #a0a394;
+            --border: #383c32;
+            --primary: #91a97d;
+            --primary-hover: #a5bd91;
+            --soft: #30362a;
+            --input: #292d24;
+            --shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
         }
 
-        .avatar{
-            width:150px;
-            height:150px;
-            border-radius:50%;
-            object-fit:cover;
-            display:block;
-            margin:auto;
+        * {
+            box-sizing: border-box;
         }
 
-        textarea{
-            width:100%;
-            height:120px;
-            padding:10px;
-            margin-top:10px;
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            transition: background .25s, color .25s;
         }
 
-        button{
-            margin-top:10px;
-            background:#2563eb;
-            color:white;
-            border:none;
-            padding:10px 15px;
-            border-radius:8px;
-            cursor:pointer;
+        nav {
+            height: 75px;
+            padding: 0 7%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
         }
 
-        .logout{
-            display:inline-block;
-            margin-top:15px;
-            text-decoration:none;
+        .logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 25px;
+            font-weight: 700;
+            color: var(--text);
+            text-decoration: none;
+            letter-spacing: -1px;
+        }
+
+        .logo span {
+            color: var(--primary);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .nav-link {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .theme-button {
+            border: 1px solid var(--border);
+            background: var(--soft);
+            color: var(--text);
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 17px;
+        }
+
+        main {
+            max-width: 680px;
+            margin: 55px auto;
+            padding: 0 20px;
+        }
+
+        .heading {
+            margin-bottom: 25px;
+        }
+
+        .heading small {
+            color: var(--primary);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-size: 11px;
+        }
+
+        h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 34px;
+            margin: 8px 0;
+            letter-spacing: -1.5px;
+        }
+
+        .heading p {
+            color: var(--muted);
+            margin: 0;
+            font-size: 15px;
+        }
+
+        .profile-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 25px;
+        }
+
+        .avatar {
+            width: 85px;
+            height: 85px;
+            flex-shrink: 0;
+            border-radius: 25px;
+            background: var(--soft);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 35px;
+            font-weight: 700;
+        }
+
+        .username {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            margin: 0 0 5px;
+        }
+
+        .profile-label {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 140px;
+            padding: 15px;
+            resize: vertical;
+            border-radius: 13px;
+            border: 1px solid var(--border);
+            background: var(--input);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
+            outline: none;
+            transition: border .2s;
+        }
+
+        textarea:focus {
+            border-color: var(--primary);
+        }
+
+        textarea::placeholder {
+            color: var(--muted);
+        }
+
+        .save-button {
+            margin-top: 15px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 13px 20px;
+            border-radius: 11px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background .2s, transform .2s;
+        }
+
+        .save-button:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
+        .footer-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            gap: 15px;
+        }
+
+        .back-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .logout-link {
+            color: #c16b61;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        @media (max-width: 500px) {
+            nav {
+                padding: 0 5%;
+            }
+
+            main {
+                margin: 35px auto;
+            }
+
+            .profile-card {
+                padding: 22px;
+            }
+
+            h1 {
+                font-size: 29px;
+            }
+
+            .avatar {
+                width: 70px;
+                height: 70px;
+                font-size: 29px;
+            }
         }
     </style>
 </head>
+
 <body>
 
-<div class="card">
+<nav>
+    <a href="/" class="logo">Code<span>Sphere</span></a>
 
-    {% if profile.avatar %}
-        <img src="{{ profile.avatar.url }}" class="avatar">
-    {% endif %}
+    <div class="nav-right">
+        <a href="/" class="nav-link">Inicio</a>
+        <button class="theme-button" id="themeButton" onclick="toggleTheme()" aria-label="Cambiar tema">🌙</button>
+    </div>
+</nav>
 
-    <h2>@{{ request.user.username }}</h2>
+<main>
+    <div class="heading">
+        <small>Tu cuenta</small>
+        <h1>Mi perfil</h1>
+        <p>Administrá tu información en CodeSphere.</p>
+    </div>
 
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
+    <div class="profile-card">
 
-        <input type="file" name="avatar">
+        <div class="profile-header">
+            <div class="avatar">
+                {{ request.user.username|first|upper }}
+            </div>
 
-        <br><br>
+            <div>
+                <h2 class="username">@{{ request.user.username }}</h2>
+                <span class="profile-label">Miembro de CodeSphere</span>
+            </div>
+        </div>
 
-        <textarea name="bio">{{ profile.bio }}</textarea>
+        <form method="POST">
+            {% csrf_token %}
 
-        <br>
+            <div class="section-title">Sobre mí</div>
 
-        <button type="submit">
-            Guardar perfil
-        </button>
-    </form>
+            <textarea
+                name="bio"
+                placeholder="Contale algo a la comunidad sobre vos..."
+            >{{ profile.bio }}</textarea>
 
-    <br>
+            <button type="submit" class="save-button">
+                Guardar cambios ↗
+            </button>
+        </form>
 
-    <a href="/" class="logout">⬅ Volver al inicio</a>
-    <br>
-    <a href="/logout/" class="logout">Cerrar sesión</a>
+        <div class="footer-actions">
+            <a href="/" class="back-link">← Volver al inicio</a>
+            <a href="/logout/" class="logout-link">Cerrar sesión</a>
+        </div>
 
-</div>
+    </div>
+</main>
+
+<script>
+    const themeButton = document.getElementById("themeButton");
+
+    function applyTheme(theme) {
+        document.body.classList.toggle("dark", theme === "dark");
+        themeButton.textContent = theme === "dark" ? "☀️" : "🌙";
+    }
+
+    function toggleTheme() {
+        const newTheme = document.body.classList.contains("dark")
+            ? "light"
+            : "dark";
+
+        localStorage.setItem("codesphere-theme", newTheme);
+        applyTheme(newTheme);
+    }
+
+    applyTheme(localStorage.getItem("codesphere-theme") || "light");
+</script>
 
 </body>
 </html>
+```
