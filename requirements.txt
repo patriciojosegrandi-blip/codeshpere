@@ -4,3 +4,4 @@ whitenoise
 cloudinary
 django-cloudinary-storage
 django-allauth[socialaccount]
+Pillow
