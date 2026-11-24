@@ -1,4 +1,3 @@
-```python
 from pathlib import Path
 
 from django.conf import settings
@@ -226,4 +225,3 @@ def user_profile(request, username):
         "posts": posts,
         "is_verified": is_verified
     })
-```
