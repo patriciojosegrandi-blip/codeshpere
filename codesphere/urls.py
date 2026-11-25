@@ -1,4 +1,3 @@
-```python
 """
 Rutas principales de CodeSphere.
 Incluye autenticación local y autenticación con Google.
@@ -33,4 +32,3 @@ urlpatterns = [
     path("profile/", views.profile_view, name="profile"),
     path("user/<str:username>/", views.user_profile, name="user_profile"),
 ]
-```
