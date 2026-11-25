@@ -1,4 +1,4 @@
-""""
+"""
 Rutas principales de CodeSphere.
 Incluye autenticación local y autenticación con Google.
 """
