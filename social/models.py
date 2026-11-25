@@ -1,4 +1,3 @@
-```python
 """
 Modelos principales de CodeSphere.
 """
@@ -59,4 +58,3 @@ class Profile(models.Model):
 
     def __str__(self):
         return f"Perfil de {self.user.username}"
-```
