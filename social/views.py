@@ -1,5 +1,6 @@
 
 from pathlib import Path
+import random
 
 from django.conf import settings
 from django.http import HttpResponse
@@ -8,6 +9,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.http import url_has_allowed_host_and_scheme
+from django.utils import timezone
 
 from .models import Post, Profile, Like
 
@@ -45,23 +47,158 @@ def get_safe_return_url(request):
 
 
 # ==========================================
+# ALGORITMO DEL FEED
+# ==========================================
+
+def generate_personalized_feed(user):
+    # Obtener exclusivamente los likes del usuario actual.
+    my_likes = Like.objects.filter(
+        user=user
+    ).select_related(
+        "post",
+        "post__user"
+    )
+
+    # Calcular interés por autor.
+    author_scores = {}
+
+    for like in my_likes:
+        author_id = like.post.user_id
+
+        # No utilizar likes propios para recomendarse a sí mismo.
+        if author_id == user.id:
+            continue
+
+        author_scores[author_id] = (
+            author_scores.get(author_id, 0) + 1
+        )
+
+    # Obtener publicaciones.
+    all_posts = list(
+        Post.objects.select_related(
+            "user"
+        ).prefetch_related(
+            "likes"
+        ).all()
+    )
+
+    personalized = []
+    discovery = []
+    own_posts = []
+
+    now = timezone.now()
+
+    for post in all_posts:
+
+        if post.user_id == user.id:
+            own_posts.append(post)
+            continue
+
+        score = author_scores.get(post.user_id, 0)
+
+        # Impulso por antigüedad.
+        age_hours = max(
+            0,
+            (now - post.created_at).total_seconds() / 3600
+        )
+
+        recency_bonus = max(
+            0,
+            2 - (age_hours / 72)
+        )
+
+        if score > 0:
+            final_score = score * 3 + recency_bonus
+
+            personalized.append(
+                (post, final_score)
+            )
+        else:
+            discovery.append(post)
+
+    # Ordenar publicaciones personalizadas.
+    personalized.sort(
+        key=lambda item: (
+            item[1],
+            item[0].created_at
+        ),
+        reverse=True
+    )
+
+    # Aleatorizar descubrimientos.
+    random.shuffle(discovery)
+
+    # Construir feed.
+    feed = []
+
+    # Intercalar publicaciones para descubrir usuarios.
+    discovery_index = 0
+
+    for index, (post, score) in enumerate(personalized):
+
+        feed.append(post)
+
+        # Insertar descubrimientos periódicamente.
+        if (
+            (index + 1) % 4 == 0
+            and discovery_index < len(discovery)
+        ):
+            feed.append(discovery[discovery_index])
+            discovery_index += 1
+
+    # Si hay pocos posts personalizados, igualmente
+    # mostrar algunas recomendaciones aleatorias.
+    if not personalized and discovery:
+        feed.extend(discovery[:5])
+
+    # Agregar publicaciones aleatorias restantes
+    # para que el usuario pueda descubrir más personas.
+    remaining_discovery = discovery[discovery_index:]
+
+    if remaining_discovery:
+        feed.extend(remaining_discovery[:3])
+
+    # Intercalar algunas publicaciones propias.
+    random.shuffle(own_posts)
+
+    for own_post in own_posts:
+        insert_at = random.randint(
+            0,
+            len(feed)
+        ) if feed else 0
+
+        feed.insert(insert_at, own_post)
+
+    # Evitar duplicados.
+    unique_feed = []
+    seen_ids = set()
+
+    for post in feed:
+        if post.id not in seen_ids:
+            unique_feed.append(post)
+            seen_ids.add(post.id)
+
+    return unique_feed
+
+
+# ==========================================
 # HOME
 # ==========================================
 
 @login_required
 def home(request):
-    posts = list(
-        Post.objects.select_related(
-            "user"
-        ).prefetch_related(
-            "likes"
-        ).all().order_by("-created_at")
+
+    posts = generate_personalized_feed(
+        request.user
     )
 
     liked_post_ids = set(
         Like.objects.filter(
             user=request.user
-        ).values_list("post_id", flat=True)
+        ).values_list(
+            "post_id",
+            flat=True
+        )
     )
 
     verified_users = get_verified_users()
@@ -87,9 +224,15 @@ def home(request):
 def like_post(request, post_id):
 
     if request.method != "POST":
-        return HttpResponse("Método no permitido", status=405)
+        return HttpResponse(
+            "Método no permitido",
+            status=405
+        )
 
-    post = get_object_or_404(Post, id=post_id)
+    post = get_object_or_404(
+        Post,
+        id=post_id
+    )
 
     like, created = Like.objects.get_or_create(
         user=request.user,
@@ -99,7 +242,9 @@ def like_post(request, post_id):
     if not created:
         like.delete()
 
-    return redirect(get_safe_return_url(request))
+    return redirect(
+        get_safe_return_url(request)
+    )
 
 
 # ==========================================
@@ -113,8 +258,15 @@ def login_view(request):
 
     if request.method == "POST":
 
-        username = request.POST.get("username", "").strip()
-        password = request.POST.get("password", "")
+        username = request.POST.get(
+            "username",
+            ""
+        ).strip()
+
+        password = request.POST.get(
+            "password",
+            ""
+        )
 
         user = authenticate(
             request,
@@ -131,7 +283,10 @@ def login_view(request):
             status=401
         )
 
-    return render(request, "login.html")
+    return render(
+        request,
+        "login.html"
+    )
 
 
 # ==========================================
@@ -155,8 +310,15 @@ def register_view(request):
 
     if request.method == "POST":
 
-        username = request.POST.get("username", "").strip()
-        password = request.POST.get("password", "")
+        username = request.POST.get(
+            "username",
+            ""
+        ).strip()
+
+        password = request.POST.get(
+            "password",
+            ""
+        )
 
         if not username or not password:
             return HttpResponse(
@@ -170,7 +332,9 @@ def register_view(request):
                 status=400
             )
 
-        if User.objects.filter(username__iexact=username).exists():
+        if User.objects.filter(
+            username__iexact=username
+        ).exists():
             return HttpResponse(
                 "Ese usuario ya existe ❌",
                 status=409
@@ -187,11 +351,16 @@ def register_view(request):
             password=password
         )
 
-        Profile.objects.get_or_create(user=user)
+        Profile.objects.get_or_create(
+            user=user
+        )
 
         return redirect("/login/")
 
-    return render(request, "register.html")
+    return render(
+        request,
+        "register.html"
+    )
 
 
 # ==========================================
@@ -203,7 +372,10 @@ def create_post(request):
 
     if request.method == "POST":
 
-        content = request.POST.get("content", "").strip()
+        content = request.POST.get(
+            "content",
+            ""
+        ).strip()
 
         if not content:
             return HttpResponse(
@@ -218,7 +390,10 @@ def create_post(request):
 
         return redirect("/")
 
-    return render(request, "create_post.html")
+    return render(
+        request,
+        "create_post.html"
+    )
 
 
 # ==========================================
@@ -234,7 +409,11 @@ def profile_view(request):
 
     if request.method == "POST":
 
-        profile.bio = request.POST.get("bio", "").strip()
+        profile.bio = request.POST.get(
+            "bio",
+            ""
+        ).strip()
+
         profile.save()
 
         return redirect("/profile/")
@@ -242,7 +421,8 @@ def profile_view(request):
     verified_users = get_verified_users()
 
     is_verified = (
-        request.user.username.casefold() in verified_users
+        request.user.username.casefold()
+        in verified_users
     )
 
     return render(request, "profile.html", {
@@ -272,12 +452,15 @@ def user_profile(request, username):
         "user"
     ).prefetch_related(
         "likes"
-    ).order_by("-created_at")
+    ).order_by(
+        "-created_at"
+    )
 
     verified_users = get_verified_users()
 
     is_verified = (
-        user_profile.username.casefold() in verified_users
+        user_profile.username.casefold()
+        in verified_users
     )
 
     liked_post_ids = set()
@@ -286,7 +469,10 @@ def user_profile(request, username):
         liked_post_ids = set(
             Like.objects.filter(
                 user=request.user
-            ).values_list("post_id", flat=True)
+            ).values_list(
+                "post_id",
+                flat=True
+            )
         )
 
     return render(request, "user_profile.html", {
