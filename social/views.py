@@ -1,3 +1,4 @@
+
 from pathlib import Path
 
 from django.conf import settings
@@ -49,11 +50,13 @@ def get_safe_return_url(request):
 
 @login_required
 def home(request):
-    posts = Post.objects.select_related(
-        "user"
-    ).prefetch_related(
-        "likes"
-    ).all().order_by("-created_at")
+    posts = list(
+        Post.objects.select_related(
+            "user"
+        ).prefetch_related(
+            "likes"
+        ).all().order_by("-created_at")
+    )
 
     liked_post_ids = set(
         Like.objects.filter(
@@ -61,9 +64,18 @@ def home(request):
         ).values_list("post_id", flat=True)
     )
 
+    verified_users = get_verified_users()
+
+    verified_post_ids = {
+        post.id
+        for post in posts
+        if post.user.username.casefold() in verified_users
+    }
+
     return render(request, "home.html", {
         "posts": posts,
-        "liked_post_ids": liked_post_ids
+        "liked_post_ids": liked_post_ids,
+        "verified_post_ids": verified_post_ids
     })
 
 
