@@ -1,16 +1,23 @@
+```python
+"""
+Modelos principales de CodeSphere.
+"""
 
 from django.db import models
 from django.contrib.auth.models import User
 
 
 class Post(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="posts"
+    )
     content = models.TextField()
-    image = models.ImageField(upload_to="posts/", blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.content[:20]
+        return f"{self.user.username}: {self.content[:40]}"
 
     @property
     def likes_count(self):
@@ -18,7 +25,11 @@ class Post(models.Model):
 
 
 class Like(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="post_likes"
+    )
     post = models.ForeignKey(
         Post,
         on_delete=models.CASCADE,
@@ -27,16 +38,25 @@ class Like(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ("user", "post")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "post"],
+                name="unique_user_post_like"
+            )
+        ]
 
     def __str__(self):
-        return f"{self.user.username} - {self.post.id}"
+        return f"{self.user.username} - publicación {self.post_id}"
 
 
 class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name="profile"
+    )
     bio = models.TextField(blank=True)
-    avatar = models.ImageField(upload_to="avatars/", blank=True, null=True)
 
     def __str__(self):
-        return self.user.username
+        return f"Perfil de {self.user.username}"
+```
