@@ -282,6 +282,15 @@
             margin-top: 3px;
         }
 
+        .verified-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: #2786d9;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
         .post-content {
             font-size: 15px;
             line-height: 1.8;
@@ -296,14 +305,37 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
         }
 
         .date { font-size: 12px; color: var(--muted); }
 
+        .like-button {
+            border: none;
+            background: var(--soft);
+            color: var(--text);
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        .like-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .like-button.liked {
+            color: #e05265;
+        }
+
         .post-tag {
             font-size: 11px;
             font-weight: 700;
-            color: var(--accent-dark);
+            color: #2786d9;
             background: var(--soft);
             padding: 6px 10px;
             border-radius: 20px;
@@ -462,17 +494,42 @@
                             </a>
                         </div>
 
-                        <div class="post-label">
-                            Miembro de CodeSphere
-                        </div>
+                        {% if post.id in verified_post_ids %}
+                            <div class="post-label">
+                                <span class="verified-badge">✓ Verificado</span>
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
 
                 <div class="post-content">{{ post.content }}</div>
 
                 <footer class="post-footer">
-                    <span class="date">{{ post.created_at|date:"d/m/Y · H:i" }}</span>
-                    <span class="post-tag">Comunidad</span>
+                    <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+                        <span class="date">
+                            {{ post.created_at|date:"d/m/Y · H:i" }}
+                        </span>
+
+                        <form method="POST" action="/like/{{ post.id }}/">
+                            {% csrf_token %}
+
+                            <button
+                                type="submit"
+                                class="like-button {% if post.id in liked_post_ids %}liked{% endif %}"
+                            >
+                                {% if post.id in liked_post_ids %}
+                                    ❤️
+                                {% else %}
+                                    ♡
+                                {% endif %}
+                                {{ post.likes.count }}
+                            </button>
+                        </form>
+                    </div>
+
+                    {% if post.id in verified_post_ids %}
+                        <span class="post-tag">✓ Verificado</span>
+                    {% endif %}
                 </footer>
 
             </article>
