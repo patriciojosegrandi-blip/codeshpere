@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -165,11 +164,36 @@
             font-size: 22px;
             font-weight: 700;
             margin: 0 0 5px;
+            overflow-wrap: anywhere;
         }
 
         .profile-label {
             color: var(--muted);
             font-size: 13px;
+        }
+
+        .verified-check {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 19px;
+            height: 19px;
+            margin-left: 5px;
+            border-radius: 50%;
+            background: #2788ed;
+            color: white;
+            font-family: Arial, sans-serif;
+            font-size: 13px;
+            font-weight: 900;
+            vertical-align: middle;
+        }
+
+        .verified-label {
+            display: inline-block;
+            margin-top: 7px;
+            color: #2788ed;
+            font-size: 12px;
+            font-weight: 700;
         }
 
         .section-title {
@@ -297,8 +321,19 @@
             </div>
 
             <div>
-                <h2 class="username">@{{ request.user.username }}</h2>
-                <span class="profile-label">Miembro de CodeSphere</span>
+                <h2 class="username">
+                    @{{ request.user.username }}
+
+                    {% if is_verified %}
+                        <span class="verified-check" title="Cuenta verificada oficialmente">✓</span>
+                    {% endif %}
+                </h2>
+
+                {% if is_verified %}
+                    <span class="verified-label">✓ Verificado de la red CodeSphere</span>
+                {% else %}
+                    <span class="profile-label">Miembro de la red CodeSphere</span>
+                {% endif %}
             </div>
         </div>
 
@@ -347,4 +382,3 @@
 
 </body>
 </html>
-```
