@@ -163,7 +163,7 @@ if GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET:
         }
     }
 
-
+SOCIALACCOUNT_LOGIN_ON_GET = True
 # ============================================================
 # VALIDACIÓN DE CONTRASEÑAS
 # ============================================================
