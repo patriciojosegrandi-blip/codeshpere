@@ -6,8 +6,9 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
+from django.utils.http import url_has_allowed_host_and_scheme
 
-from .models import Post, Profile
+from .models import Post, Profile, Like
 
 
 # ==========================================
@@ -15,15 +16,7 @@ from .models import Post, Profile
 # ==========================================
 
 def get_verified_users():
-    """
-    Lee los usuarios verificados desde verified.txt.
-    Ignora líneas vacías y diferencias entre mayúsculas/minúsculas.
-    """
-
     verified_file = Path(settings.BASE_DIR) / "verified.txt"
-
-    if not verified_file.exists():
-        return set()
 
     try:
         return {
@@ -37,6 +30,19 @@ def get_verified_users():
         return set()
 
 
+def get_safe_return_url(request):
+    referer = request.META.get("HTTP_REFERER", "")
+
+    if url_has_allowed_host_and_scheme(
+        referer,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure()
+    ):
+        return referer
+
+    return "/"
+
+
 # ==========================================
 # HOME
 # ==========================================
@@ -45,11 +51,43 @@ def get_verified_users():
 def home(request):
     posts = Post.objects.select_related(
         "user"
+    ).prefetch_related(
+        "likes"
     ).all().order_by("-created_at")
 
+    liked_post_ids = set(
+        Like.objects.filter(
+            user=request.user
+        ).values_list("post_id", flat=True)
+    )
+
     return render(request, "home.html", {
-        "posts": posts
+        "posts": posts,
+        "liked_post_ids": liked_post_ids
     })
+
+
+# ==========================================
+# LIKES
+# ==========================================
+
+@login_required
+def like_post(request, post_id):
+
+    if request.method != "POST":
+        return HttpResponse("Método no permitido", status=405)
+
+    post = get_object_or_404(Post, id=post_id)
+
+    like, created = Like.objects.get_or_create(
+        user=request.user,
+        post=post
+    )
+
+    if not created:
+        like.delete()
+
+    return redirect(get_safe_return_url(request))
 
 
 # ==========================================
@@ -189,8 +227,15 @@ def profile_view(request):
 
         return redirect("/profile/")
 
+    verified_users = get_verified_users()
+
+    is_verified = (
+        request.user.username.casefold() in verified_users
+    )
+
     return render(request, "profile.html", {
-        "profile": profile
+        "profile": profile,
+        "is_verified": is_verified
     })
 
 
@@ -211,6 +256,10 @@ def user_profile(request, username):
 
     posts = Post.objects.filter(
         user=user_profile
+    ).select_related(
+        "user"
+    ).prefetch_related(
+        "likes"
     ).order_by("-created_at")
 
     verified_users = get_verified_users()
@@ -219,9 +268,19 @@ def user_profile(request, username):
         user_profile.username.casefold() in verified_users
     )
 
+    liked_post_ids = set()
+
+    if request.user.is_authenticated:
+        liked_post_ids = set(
+            Like.objects.filter(
+                user=request.user
+            ).values_list("post_id", flat=True)
+        )
+
     return render(request, "user_profile.html", {
         "profile": profile,
         "user_profile": user_profile,
         "posts": posts,
-        "is_verified": is_verified
+        "is_verified": is_verified,
+        "liked_post_ids": liked_post_ids
     })
