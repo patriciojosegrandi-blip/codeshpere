@@ -18,6 +18,8 @@ urlpatterns = [
     path('profile/', views.profile_view, name='profile'),
 
     path('user/<str:username>/', views.user_profile, name='user_profile'),
+
+    path("like/<int:post_id>/", views.like_post, name="like_post"),
 ]
 
 if settings.DEBUG:
